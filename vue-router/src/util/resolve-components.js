@@ -4,7 +4,7 @@ import { _Vue } from '../install'
 import { warn, isError } from './warn'
 
 export function resolveAsyncComponents (matched: Array<RouteRecord>): Function {
-  return (to, from, next) => {
+  return function resolveComponentsCb (to, from, next) {
     let hasAsync = false
     let pending = 0
     let error = null

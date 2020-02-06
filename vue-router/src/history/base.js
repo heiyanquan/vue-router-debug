@@ -67,7 +67,6 @@ export class History {
     onComplete?: Function,
     onAbort?: Function
   ) {
-    debugger
     const route = this.router.match(location, this.current)
     this.confirmTransition(
       route,
@@ -125,12 +124,11 @@ export class History {
       this.ensureURL()
       return abort(new NavigationDuplicated(route))
     }
-    debugger
     const { updated, deactivated, activated } = resolveQueue(
       this.current.matched,
       route.matched
     )
-
+    // queue = [beforeEach, beforeEnter, resolveAsyncComponents]
     const queue: Array<?NavigationGuard> = [].concat(
       // in-component leave guards
       extractLeaveGuards(deactivated),
@@ -143,9 +141,8 @@ export class History {
       // async components
       resolveAsyncComponents(activated)
     )
-
     this.pending = route
-    debugger
+    // hook beforeEach, beforeEnter, resolveAsyncComponents
     const iterator = (hook: NavigationGuard, next) => {
       if (this.pending !== route) {
         return abort()
@@ -177,13 +174,13 @@ export class History {
         abort(e)
       }
     }
-
     runQueue(queue, iterator, () => {
       const postEnterCbs = []
       const isValid = () => this.current === route
       // wait until async components are resolved before
       // extracting in-component enter guards
       const enterGuards = extractEnterGuards(activated, postEnterCbs, isValid)
+      // beforeRouteEnter, beforeResolve
       const queue = enterGuards.concat(this.router.resolveHooks)
       runQueue(queue, iterator, () => {
         if (this.pending !== route) {

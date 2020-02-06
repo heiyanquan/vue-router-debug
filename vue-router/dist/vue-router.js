@@ -96,7 +96,6 @@
         cache[name] = null;
         return h()
       }
-
       var component = cache[name] = matched.components[name];
 
       // attach instance registration hook
@@ -1860,7 +1859,7 @@
   /*  */
 
   function resolveAsyncComponents (matched) {
-    return function (to, from, next) {
+    return function resolveComponentsCb (to, from, next) {
       var hasAsync = false;
       var pending = 0;
       var error = null;
@@ -2033,7 +2032,6 @@
   ) {
       var this$1 = this;
 
-    debugger
     var route = this.router.match(location, this.current);
     this.confirmTransition(
       route,
@@ -2093,7 +2091,6 @@
       this.ensureURL();
       return abort(new NavigationDuplicated(route))
     }
-    debugger
     var ref = resolveQueue(
       this.current.matched,
       route.matched
@@ -2101,7 +2098,7 @@
       var updated = ref.updated;
       var deactivated = ref.deactivated;
       var activated = ref.activated;
-
+    // queue = [beforeEach, beforeEnter, resolveAsyncComponents]
     var queue = [].concat(
       // in-component leave guards
       extractLeaveGuards(deactivated),
@@ -2114,9 +2111,8 @@
       // async components
       resolveAsyncComponents(activated)
     );
-
     this.pending = route;
-    debugger
+    // hook beforeEach, beforeEnter, resolveAsyncComponents
     var iterator = function (hook, next) {
       if (this$1.pending !== route) {
         return abort()
@@ -2148,13 +2144,13 @@
         abort(e);
       }
     };
-
     runQueue(queue, iterator, function () {
       var postEnterCbs = [];
       var isValid = function () { return this$1.current === route; };
       // wait until async components are resolved before
       // extracting in-component enter guards
       var enterGuards = extractEnterGuards(activated, postEnterCbs, isValid);
+      // beforeRouteEnter, beforeResolve
       var queue = enterGuards.concat(this$1.router.resolveHooks);
       runQueue(queue, iterator, function () {
         if (this$1.pending !== route) {

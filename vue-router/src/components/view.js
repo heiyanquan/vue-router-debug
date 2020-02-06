@@ -50,7 +50,7 @@ export default {
       cache[name] = null
       return h()
     }
-
+    
     const component = cache[name] = matched.components[name]
 
     // attach instance registration hook
